@@ -1,6 +1,7 @@
 import math
 from inputs import InputWorkload
 from settings import Settings
+from veeam_backup import VeeamBackupResult
 
 
 class AzureIndResult:
@@ -64,3 +65,52 @@ class AzureBackup:
             instance_results.append(__result)
 
         return AzureBackupResult(instance_results)
+
+
+class AzureBackupCostResult:
+    type: str
+    storage_per_month: float
+    snapshot_per_month: float
+    total_storage_per_month: float
+    total_storage_per_year: float
+
+    def __init__(self, type, storage_per_month, snapshot_per_month) -> None:
+        self.type = type
+        self.storage_per_month = storage_per_month
+        self.snapshot_per_month = snapshot_per_month
+        self.total_storage_per_month = storage_per_month + snapshot_per_month
+        self.total_storage_per_year = self.total_storage_per_month * 12
+
+
+class AzureBackupCost:
+    azure_results: AzureBackupResult
+
+    def __init__(
+        self,
+        azure_backup: AzureBackup,
+        inputs: InputWorkload,
+        veeam_backup_totals: VeeamBackupResult,
+        settings: Settings,
+    ) -> AzureBackupResult:
+        self.azure_backup = azure_backup
+        self.inputs = inputs
+        self.veeam_backup_totals = veeam_backup_totals
+        self.settings = settings
+
+    def calculate_backup_cost(self) -> AzureBackupCostResult:
+        __storage_per_month = self.azure_backup.azure_results.total_storage * (
+            self.settings.azure_backup.backup_vault.ra_grs
+            * 1024
+            * (1 - self.inputs.backup_properties.azure_discount)
+        )
+        __storage_cost_month = (
+            self.veeam_backup_totals.snapshot_volume
+            * 1024
+            * (1 - self.inputs.backup_properties.azure_discount)
+        )
+        __azure_cost_result = AzureBackupCostResult(
+            "Azure Backup",
+            __storage_per_month,
+            __storage_cost_month,
+        )
+        return __azure_cost_result

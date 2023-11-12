@@ -1,22 +1,59 @@
-import dataclasses
-import settings
-import inputs
-import veeam_backup
+from dataclasses import dataclass
+from settings import Settings
+from inputs import InputWorkload
+from veeam_backup import VeeamBackupResult
 
 
-@dataclasses
 class VeeamComputeCostResult:
-    name: str
-    compute_per_month: float
-    compute_per_year: float
+    worker_payg: float
+    worker_payg_year: float
+    worker_res_3y: float
+    worker_res_3y_year: float
+    vbas_payg: float
+    vbas_payg_year: float
+    vbas_res_3y: float
+    vbas_res_3y_year: float
+    vbr_servers_payg: float
+    vbr_servers_payg_year: float
+    vbr_servers_res_3y: float
+    vbr_servers_res_3y_year: float
+
+    total_worker_cost: float
+    vba_appliance_total: float
+    vbr_servers_total: float
+
+    def __init__(
+        self,
+        worker_payg,
+        worker_res_3y,
+        vbas_payg,
+        vbas_res_3y,
+        vbr_servers_payg,
+        vbr_servers_res_3y,
+    ) -> None:
+        self.worker_payg = worker_payg
+        self.worker_payg_year = worker_payg * 12
+        self.worker_res_3y = worker_res_3y
+        self.worker_res_3y_year = worker_res_3y * 12
+        self.vbas_payg = vbas_payg
+        self.vbas_payg_year = vbas_payg * 12
+        self.vbas_res_3y = vbas_res_3y
+        self.vbas_res_3y_year = vbas_res_3y * 12
+        self.vbr_servers_payg = vbr_servers_payg
+        self.vbr_servers_payg_year = vbr_servers_payg * 12
+        self.vbr_servers_res_3y = vbr_servers_res_3y
+        self.vbr_servers_res_3y_year = vbr_servers_res_3y * 12
+        self.total_worker_cost = min(self.worker_payg, self.worker_res_3y)
+        self.vba_appliance_total = min(self.vbas_payg, self.vbas_res_3y)
+        self.vbr_servers_total = min(self.vbr_servers_payg, self.vbr_servers_res_3y)
 
 
 class VeeamComputeCost:
     def __init__(
         self,
-        settings: settings,
-        inputs: inputs,
-        veeam_backup_totals: veeam_backup.VeeamBackupResult,
+        settings: Settings,
+        inputs: InputWorkload,
+        veeam_backup_totals: VeeamBackupResult,
     ) -> None:
         self.settings = settings
         self.inputs = inputs

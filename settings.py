@@ -244,6 +244,7 @@ class Settings:
     azure_compute: List[AzureCompute]
     general: General
     veeam_parameters: VeeamParameters
+    vm_snapshot_cost: float
 
     def __init__(
         self,
@@ -253,6 +254,7 @@ class Settings:
         azure_compute: List[AzureCompute],
         general: General,
         veeam_parameters: VeeamParameters,
+        vm_snapshot_cost: float,
     ) -> None:
         self.azure_backup = azure_backup
         self.azure_blob = azure_blob
@@ -260,3 +262,4 @@ class Settings:
         self.azure_compute = azure_compute
         self.general = general
         self.veeam_parameters = veeam_parameters
+        self.vm_snapshot_cost = vm_snapshot_cost

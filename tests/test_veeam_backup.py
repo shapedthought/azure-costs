@@ -103,6 +103,7 @@ class TestVeeamBackup(unittest.TestCase):
             azure_compute=self.azure_compute,
             general=self.general,
             veeam_parameters=self.parameters,
+            vm_snapshot_cost=0.132,
         )
 
         self.workloads = [

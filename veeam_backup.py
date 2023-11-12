@@ -3,6 +3,7 @@ import functools
 from settings import Settings
 from inputs import InputWorkload
 import math
+import pprint
 
 
 @dataclass
@@ -130,7 +131,7 @@ class VeeamBackup:
         )
         __total_storage_accounts = max([x.no_storage_accounts for x in results])
 
-        return VeeamBackupResult(
+        result = VeeamBackupResult(
             __total_incremental_size,
             __total_backup_volume,
             __total_snapshot_volume,
@@ -139,3 +140,5 @@ class VeeamBackup:
             __total_no_workers,
             __total_storage_accounts,
         )
+
+        return result

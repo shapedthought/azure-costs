@@ -1,0 +1,126 @@
+{
+  "azure_backup": {
+    "backup_service": {
+      "per_vm_under_50": 5,
+      "per_vm_over_50": 10
+    },
+    "backup_vault": {
+      "LRS": 0,
+      "GRS": 0,
+      "RA-GRS": 0.05696
+    },
+    "backup_snapshot_cost": {
+      "instance": 0.145
+    }
+  },
+  "azure_blob": [
+    {
+      "name": "Cold RA-GRS PAGY",
+      "cost": 0.025
+    },
+    {
+      "name": "Cold RA-GRS",
+      "cost": 0.0155
+    },
+    {
+      "name": "Hot RS-GRS PAGY",
+      "cost": 0.049
+    },
+    {
+      "name": "Hot RA-GRS",
+      "cost": 0.0303
+    }
+  ],
+  "api_costs": {
+    "cold": 0.02,
+    "hot": 0.01
+  },
+  "azure_compute": [
+    {
+      "vm_size": "Standard_F2s_v2, 2 CPU, 4 GB RAM (payg)",
+      "per_hour": 82.08,
+      "worker": true,
+      "throughput": 90
+    },
+    {
+      "vm_size": "Standard_F2s_v2, 2 CPU, 4 GB RAM (res-3y)",
+      "per_hour": 41.19,
+      "worker": true,
+      "throughput": 90
+    },
+    {
+      "vm_size": "Standard_F4s_v2, 4 CPU, 8 GB RAM (payg)",
+      "per_hour": 163.44,
+      "worker": true,
+      "throughput": 180
+    },
+    {
+      "vm_size": "Standard_F4s_v2, 4 CPU, 8 GB RAM (res-3y)",
+      "per_hour": 81.06,
+      "worker": true,
+      "throughput": 180
+    },
+    {
+      "vm_size": "Standard_F8s_v2, 8 CPU, 16 GB RAM (payg)",
+      "per_hour": 326.88,
+      "worker": false,
+      "throughput": 0
+    },
+    {
+      "vm_size": "Standard_F8s_v2, 8 CPU, 16 GB RAM (res-3y)",
+      "per_hour": 162.14,
+      "worker": false,
+      "throughput": 0
+    },
+    {
+      "vm_size": "E4s_v3 4 CPU 32 GB (payg)",
+      "per_hour": 230.4,
+      "worker": false,
+      "throughput": 0
+    },
+    {
+      "vm_size": "E4s_v3 4 CPU 32 GB (res-3y)",
+      "per_hour": 87.86,
+      "worker": false,
+      "throughput": 0
+    },
+    {
+      "vm_size": "F16s 16 CPUs 32 GB (payg)",
+      "per_hour": 654.48,
+      "worker": false,
+      "throughput": 0
+    },
+    {
+      "vm_size": "F16s 16 CPUs 32 GB (res-3y)",
+      "per_month": 325.03,
+      "worker": false,
+      "throughput": 0
+    }
+  ],
+  "general": {
+    "veeam_reduction": 0.5,
+    "azure_reduction": 0,
+    "daily_change_rate": 0.03,
+    "veeam_source_block_size": 1024,
+    "worker_speed": 90,
+    "storage_acc_speed_limit": 3200,
+    "max_no_policies_per_vba": 200,
+    "max_worker_per_account": 36,
+    "max_no_vms_per_vbr": 10000,
+    "max_workloads_policy": 1000,
+    "vba_appliance_ram": 32,
+    "min_required_storage_accounts": 32,
+    "no_workers_based_on_source_vol": 6.76
+  },
+  "veeam_parameters": {
+    "veeam_std_cost": 1320,
+    "discount_veeam_price": 1320,
+    "total_no_azure_vms": 1200,
+    "no_vba_appliances_based_on_vms": 3,
+    "ram_available_for_policies": 28.9,
+    "max_no_of_maxed_policies": 9,
+    "max_no_workers_per_appliance": 4500,
+    "no_vba_appliances_based_policies": 1,
+    "results_min_vba_appliances": 3
+  }
+}

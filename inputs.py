@@ -44,9 +44,11 @@ class VMWorkload:
 class InputWorkload:
     vm_workloads: List[VMWorkload]
     backup_properties: BackupProperties
+    total_vm_count: int
 
     def __init__(
         self, vm_workloads: List[VMWorkload], backup_properties: BackupProperties
     ) -> None:
         self.vm_workloads = vm_workloads
         self.backup_properties = backup_properties
+        self.total_vm_count = sum([i.count for i in self.vm_workloads])

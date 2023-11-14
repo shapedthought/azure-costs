@@ -3,7 +3,6 @@ import math
 from settings import Settings
 from inputs import InputWorkload
 from veeam_backup import VeeamBackupResult
-import pprint
 
 
 class VeeamComputeCostResult:
@@ -23,6 +22,9 @@ class VeeamComputeCostResult:
     total_worker_cost: float
     vba_appliance_total: float
     vbr_servers_total: float
+    vbr_quantity_cost: float
+
+    veeam_vul_cost_year: float
 
     def __init__(
         self,
@@ -32,6 +34,8 @@ class VeeamComputeCostResult:
         vbas_res_3y,
         vbr_servers_payg,
         vbr_servers_res_3y,
+        vbr_quantity_cost,
+        vul_cost_year,
     ) -> None:
         self.worker_payg = worker_payg
         self.worker_payg_year = worker_payg * 12
@@ -50,6 +54,8 @@ class VeeamComputeCostResult:
         self.vbr_servers_total = min(
             self.vbr_servers_payg_year, self.vbr_servers_res_3y_year
         )
+        self.vbr_quantity_cost = vbr_quantity_cost
+        self.vul_cost_year = vul_cost_year
 
 
 class VeeamComputeCost:
@@ -132,6 +138,17 @@ class VeeamComputeCost:
             * __es4_v3_res_3y
             * (1 - self.inputs.backup_properties.azure_discount)
         )
+        __vbr_quantity_cost = (
+            12
+            * 3
+            * __es4_v3_res_3y
+            * (1 - self.inputs.backup_properties.azure_discount)
+        )
+        __vul_cost_year = (
+            self.inputs.total_vm_count
+            * (self.settings.veeam_parameters.discount_veeam_price / 12 / 10)
+            * 12
+        )
 
         __result = VeeamComputeCostResult(
             __worker_payg_per_month,
@@ -140,6 +157,8 @@ class VeeamComputeCost:
             __vba_payg_res_3y,
             __vbr_servers_payg,
             __vbr_servers_res_3y,
+            __vbr_quantity_cost,
+            __vul_cost_year,
         )
 
         return __result

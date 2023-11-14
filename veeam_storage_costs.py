@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from settings import Settings
 from inputs import InputWorkload
 from veeam_backup import VeeamBackupResult
-import pprint
+from typing import List
 
 
 @dataclass
@@ -28,8 +28,8 @@ class VeeamAzureCosts:
         self.inputs = inputs
         self.veeam_backup_totals = veeam_backup_totals
 
-    def calculate_storage_costs(self) -> [VeeamAzureCostsResult]:
-        __results: [VeeamAzureCostsResult] = []
+    def calculate_storage_costs(self) -> List[VeeamAzureCostsResult]:
+        __results: List[VeeamAzureCostsResult] = []
         for i in self.settings.azure_blob:
             __storage_per_month = (
                 self.veeam_backup_totals.total_backup_volume

@@ -1,3 +1,5 @@
+from azure_backup_storage import AzureBackupCost, AzureBackupInstances
+from veeam_azure_compute_cost import VeeamComputeCost
 from veeam_backup import VeeamBackup
 from settings import (
     Settings,
@@ -15,7 +17,8 @@ from settings import (
     StorageAccountSpeedLimit,
 )
 from inputs import VMWorkload, BackupProperties, InputWorkload
-from veeam_azure_compute_cost import VeeamComputeCost
+from veeam_storage_costs import VeeamAzureCosts
+from cost_comparison import CostComparison
 import unittest
 
 
@@ -127,23 +130,52 @@ class TestVeeamBackup(unittest.TestCase):
         self.veeam_backup = VeeamBackup(settings=self.settings, inputs=self.inputs)
         self.incremental_results = self.veeam_backup.calculate_incremental()
         self.full_results = self.veeam_backup.calculate_totals(self.incremental_results)
-        self.compute_costs = VeeamComputeCost(
+        self.azure_backup_instances = AzureBackupInstances(
+            settings=self.settings, inputs=self.inputs
+        )
+        self.azure_backup_instances_results = (
+            self.azure_backup_instances.calculate_backup()
+        )
+        self.azure_backup_cost = AzureBackupCost(
+            settings=self.settings,
+            inputs=self.inputs,
+            azure_backup=self.azure_backup_instances_results,
+            veeam_backup_totals=self.full_results,
+        )
+        self.azure_backup_cost_result = self.azure_backup_cost.calculate_backup_cost()
+        self.veeam_az_storage = VeeamAzureCosts(
             settings=self.settings,
             inputs=self.inputs,
             veeam_backup_totals=self.full_results,
         )
-        self.compute_costs_results = self.compute_costs.calculate_compute_costs()
+        self.veeam_az_storage_results = self.veeam_az_storage.calculate_storage_costs()
+        self.veeam_az_compute = VeeamComputeCost(
+            settings=self.settings,
+            inputs=self.inputs,
+            veeam_backup_totals=self.full_results,
+        )
+        self.veeam_az_compute_totals = self.veeam_az_compute.calculate_compute_costs()
 
-    def test_veeam_backup(self):
+        self.cost_comparison = CostComparison(
+            veeam_storage_costs=self.veeam_az_storage_results,
+            azure_backup_cost=self.azure_backup_cost_result,
+            veeam_compute_cost=self.veeam_az_compute_totals,
+        )
+        self.cost_comparison_results = self.cost_comparison.calculate_cost_comparison()
+
+    def test_veeam_storage_costs(self):
         self.assertAlmostEqual(
-            self.compute_costs_results.total_worker_cost, 1838.592, places=2
+            self.cost_comparison_results.veeam_backup_total_cost_year,
+            3153511.243,
+            places=2,
         )
         self.assertAlmostEqual(
-            self.compute_costs_results.vba_appliance_total, 2214.11232, places=2
+            self.cost_comparison_results.azure_backup_total_cost_year,
+            3617911.274,
+            places=2,
         )
         self.assertAlmostEqual(
-            self.compute_costs_results.vbr_servers_total, 1476.074, places=2
-        )
-        self.assertAlmostEqual(
-            self.compute_costs_results.vul_cost_year, 1562400, places=2
+            self.cost_comparison_results.agent_backup_total_cost_year,
+            1846302.8371,
+            places=2,
         )

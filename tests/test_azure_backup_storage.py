@@ -141,13 +141,27 @@ class TestVeeamBackup(unittest.TestCase):
         )
         self.azure_backup_cost_result = self.azure_backup_cost.calculate_backup_cost()
 
-    def test_veeam_backup(self):
-        self.assertAlmostEqual(self.full_results.incremental_size, 16.70, places=2)
+    def test_azure_backup_instances(self):
         self.assertAlmostEqual(
-            self.full_results.total_backup_volume, 788.9296875, places=2
+            self.azure_backup_instances_results.total_instance_cost, 77000, places=2
         )
-        self.assertAlmostEqual(self.full_results.snapshot_volume, 1146.68, places=0)
-        self.assertAlmostEqual(self.full_results.api_put_per_month, 1050624, places=2)
-        self.assertAlmostEqual(self.full_results.incremental_throughput, 608, places=0)
-        self.assertAlmostEqual(self.full_results.no_workers, 8, places=0)
-        self.assertAlmostEqual(self.full_results.no_storage_accounts, 1, places=0)
+        self.assertAlmostEqual(
+            self.azure_backup_instances_results.total_storage, 2579.10, places=2
+        )
+        self.assertAlmostEqual(
+            self.azure_backup_cost_result.storage_per_month, 105301.95, places=2
+        )
+        self.assertAlmostEqual(
+            self.azure_backup_cost_result.snapshot_per_month, 119190.65, places=2
+        )
+        self.assertAlmostEqual(
+            self.azure_backup_cost_result.total_storage_per_month, 224492.606, places=2
+        )
+        self.assertAlmostEqual(
+            self.azure_backup_cost_result.total_storage_per_year, 2693911.274, places=2
+        )
+        self.assertAlmostEqual(
+            self.azure_backup_cost_result.azure_backup_instance_cost,
+            924000.00,
+            places=2,
+        )

@@ -28,8 +28,6 @@ def main():
         input_vm_workloads = json.load(f)
         input_vm_workloads = ip.Inputs.from_dict(input_vm_workloads)
 
-    pprint.pprint(input_vm_workloads.__dict__)
-
 
 if __name__ == "__main__":
     main()

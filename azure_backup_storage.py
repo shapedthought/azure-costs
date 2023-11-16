@@ -3,7 +3,6 @@ import pprint
 from inputs import InputWorkload
 from settings import Settings
 from veeam_backup import VeeamBackupResult
-from typing import List
 
 
 class AzureIndResult:
@@ -20,11 +19,11 @@ class AzureIndResult:
 
 
 class AzureBackupResult:
-    backup_instances: List[AzureIndResult]
+    backup_instances: list[AzureIndResult]
     total_instance_cost: float
     total_storage: float
 
-    def __init__(self, backup_instances: List[AzureIndResult]) -> None:
+    def __init__(self, backup_instances: list[AzureIndResult]) -> None:
         self.backup_instances = backup_instances
         self.total_instance_cost = 0
         self.total_storage = 0

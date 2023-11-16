@@ -1,4 +1,3 @@
-from typing import List, Dict
 import math
 from enum import Enum
 
@@ -239,9 +238,9 @@ class VeeamParameters(General):
 
 class Settings:
     azure_backup: AzureBackup
-    azure_blob: List[AzureBlob]
+    azure_blob: list[AzureBlob]
     api_costs: APICosts
-    azure_compute: List[AzureCompute]
+    azure_compute: list[AzureCompute]
     general: General
     veeam_parameters: VeeamParameters
     vm_snapshot_cost: float
@@ -249,9 +248,9 @@ class Settings:
     def __init__(
         self,
         azure_backup: AzureBackup,
-        azure_blob: List[AzureBlob],
+        azure_blob: list[AzureBlob],
         api_costs: APICosts,
-        azure_compute: List[AzureCompute],
+        azure_compute: list[AzureCompute],
         general: General,
         veeam_parameters: VeeamParameters,
         vm_snapshot_cost: float,

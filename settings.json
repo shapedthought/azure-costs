@@ -110,7 +110,8 @@
     "max_workloads_policy": 1000,
     "vba_appliance_ram": 32,
     "min_required_storage_accounts": 32,
-    "no_workers_based_on_source_vol": 6.76
+    "no_workers_based_on_source_vol": 6.76,
+    "backup_window": 8
   },
   "veeam_parameters": {
     "veeam_std_cost": 1320,

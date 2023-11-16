@@ -1,7 +1,6 @@
 from veeam_storage_costs import VeeamAzureCostsResult
 from veeam_azure_compute_cost import VeeamComputeCostResult
 from azure_backup_storage import AzureBackupCostResult
-from typing import List
 
 
 class CostComparisonResult:
@@ -21,13 +20,13 @@ class CostComparisonResult:
 
 
 class CostComparison:
-    veeam_storage_costs: List[VeeamAzureCostsResult]
+    veeam_storage_costs: list[VeeamAzureCostsResult]
     azure_backup_cost: AzureBackupCostResult
     veeam_compute_cost: VeeamComputeCostResult
 
     def __init__(
         self,
-        veeam_storage_costs: List[VeeamAzureCostsResult],
+        veeam_storage_costs: list[VeeamAzureCostsResult],
         azure_backup_cost: AzureBackupCostResult,
         veeam_compute_cost: VeeamComputeCostResult,
     ) -> None:

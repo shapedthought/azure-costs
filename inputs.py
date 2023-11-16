@@ -1,6 +1,3 @@
-from typing import List
-
-
 class BackupProperties:
     retention_days: int
     backup_window: int
@@ -42,12 +39,12 @@ class VMWorkload:
 
 
 class InputWorkload:
-    vm_workloads: List[VMWorkload]
+    vm_workloads: list[VMWorkload]
     backup_properties: BackupProperties
     total_vm_count: int
 
     def __init__(
-        self, vm_workloads: List[VMWorkload], backup_properties: BackupProperties
+        self, vm_workloads: list[VMWorkload], backup_properties: BackupProperties
     ) -> None:
         self.vm_workloads = vm_workloads
         self.backup_properties = backup_properties

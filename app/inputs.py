@@ -1,9 +1,13 @@
+from functools import reduce
+from pydantic import BaseModel
+
+
 class BackupProperties:
     retention_days: int
     backup_window: int
     snapshots_kept: int
     first_snap_full: bool
-    avg_vdisk_utilization: int
+    avg_vdisk_utilization: float
     veeam_discount: int
     azure_discount: float
 
@@ -13,7 +17,7 @@ class BackupProperties:
         backup_window: int,
         snapshots_kept: int,
         first_snap_full: bool,
-        avg_vdisk_utilization: int,
+        avg_vdisk_utilization: float,
         veeam_discount: int,
         azure_discount: float,
     ) -> None:
@@ -42,10 +46,21 @@ class InputWorkload:
     vm_workloads: list[VMWorkload]
     backup_properties: BackupProperties
     total_vm_count: int
+    total_capacity: float
+    total_capacity_tb: float
 
     def __init__(
         self, vm_workloads: list[VMWorkload], backup_properties: BackupProperties
     ) -> None:
         self.vm_workloads = vm_workloads
         self.backup_properties = backup_properties
-        self.total_vm_count = sum([i.count for i in self.vm_workloads])
+        # self.total_vm_count = reduce(lambda x, y: x + y.count, self.vm_workloads, 0)
+        # self.total_capacity = reduce(
+        #     lambda x, y: x + (y.size * y.count), self.vm_workloads, 0.0
+        # )
+        # self.total_size_tb = self.total_capacity / 1024
+        self.total_vm_count = 0
+        self.total_capacity_tb = 0
+        for i in self.vm_workloads:
+            self.total_vm_count += i.count
+            self.total_capacity_tb += i.total_size_tb

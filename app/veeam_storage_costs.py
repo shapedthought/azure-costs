@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from settings import Settings
-from inputs import InputWorkload
-from veeam_backup import VeeamBackupResult
+from app.settings import Settings
+from app.inputs import InputWorkload
+from app.veeam_backup import VeeamBackupResult
 
 
 @dataclass

@@ -1,8 +1,8 @@
 import math
 import pprint
-from inputs import InputWorkload
-from settings import Settings
-from veeam_backup import VeeamBackupResult
+from app.inputs import InputWorkload
+from app.settings import Settings
+from app.veeam_backup import VeeamBackupResult
 
 
 class AzureIndResult:

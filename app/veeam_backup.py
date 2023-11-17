@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import functools
-from settings import Settings
-from inputs import InputWorkload
+from app.settings import Settings
+from app.inputs import InputWorkload
 import math
 import pprint
 

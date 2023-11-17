@@ -1,6 +1,6 @@
-from veeam_storage_costs import VeeamAzureCostsResult
-from veeam_azure_compute_cost import VeeamComputeCostResult
-from azure_backup_storage import AzureBackupCostResult
+from app.veeam_storage_costs import VeeamAzureCostsResult
+from app.veeam_azure_compute_cost import VeeamComputeCostResult
+from app.azure_backup_storage import AzureBackupCostResult
 
 
 class CostComparisonResult:
@@ -60,6 +60,8 @@ class CostComparison:
             + self.veeam_compute_cost.vbr_quantity_cost
         )
         __cost_results = CostComparisonResult(
-            __veeam_backup_total, __azure_backup_total, __agent_backup_total
+            round(__veeam_backup_total, 2),
+            round(__azure_backup_total, 2),
+            round(__agent_backup_total, 2),
         )
         return __cost_results

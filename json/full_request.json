@@ -1,0 +1,149 @@
+{
+  "settings": {
+    "azure_backup": {
+      "backup_service": {
+        "per_vm_under_50": 5,
+        "per_vm_over_50": 10
+      },
+      "backup_vault": {
+        "lrs": 0,
+        "grs": 0,
+        "ra_grs": 0.05696
+      },
+      "backup_snapshot_cost": {
+        "instance": 0.145
+      }
+    },
+    "azure_blob": [
+      {
+        "name": "Cold RA-GRS (payg)",
+        "cost": 0.025
+      },
+      {
+        "name": "Cold RA-GRS (1PB-res-3y)",
+        "cost": 0.0155
+      },
+      {
+        "name": "Hot RA-GRS (payg)",
+        "cost": 0.049
+      },
+      {
+        "name": "Hot RA-GRS (1PB-res-3y)",
+        "cost": 0.0303
+      }
+    ],
+    "api_costs": {
+      "cold": 0.02,
+      "hot": 0.0108
+    },
+    "azure_compute": [
+      {
+        "vm_size": "Standard_F2s_v2, 2 CPU, 4 GB RAM (payg)",
+        "per_hour": 0.114,
+        "worker": true,
+        "throughput": 90
+      },
+      {
+        "vm_size": "Standard_F2s_v2, 2 CPU, 4 GB RAM (res-3y)",
+        "per_hour": 0.05721,
+        "worker": true,
+        "throughput": 90
+      },
+      {
+        "vm_size": "Standard_F4s_v2, 4 CPU, 8 GB RAM (payg)",
+        "per_hour": 0.32,
+        "worker": true,
+        "throughput": 180
+      },
+      {
+        "vm_size": "Standard_F4s_v2, 4 CPU, 8 GB RAM (res-3y)",
+        "per_hour": 0.12203,
+        "worker": true,
+        "throughput": 180
+      },
+      {
+        "vm_size": "Standard_F8s_v2, 8 CPU, 16 GB RAM (payg)",
+        "per_hour": 0.454,
+        "worker": false,
+        "throughput": 0
+      },
+      {
+        "vm_size": "Standard_F8s_v2, 8 CPU, 16 GB RAM (res-3y)",
+        "per_hour": 0.22519,
+        "worker": false,
+        "throughput": 0
+      },
+      {
+        "vm_size": "E4s_v3 4 CPU 32 GB (payg)",
+        "per_hour": 0.32,
+        "worker": false,
+        "throughput": 0
+      },
+      {
+        "vm_size": "E4s_v3 4 CPU 32 GB (res-3y)",
+        "per_hour": 0.12203,
+        "worker": false,
+        "throughput": 0
+      },
+      {
+        "vm_size": "F16s 16 CPUs 32 GB (payg)",
+        "per_hour": 0.909,
+        "worker": false,
+        "throughput": 0
+      },
+      {
+        "vm_size": "F16s 16 CPUs 32 GB (res-3y)",
+        "per_hour": 0.45143,
+        "worker": false,
+        "throughput": 0
+      }
+    ],
+    "general": {
+      "veeam_reduction": 0.5,
+      "azure_reduction": 0,
+      "daily_change_rate": 0.03,
+      "veeam_source_block_size": 1024,
+      "worker_speed": 90,
+      "azstorage_acc_limit": 3200,
+      "max_no_policies_per_vba": 200,
+      "max_worker_per_account": 36,
+      "max_no_vms_per_vbr": 10000,
+      "max_workloads_policy": 1000,
+      "vbaz_appliance_ram": 32
+    },
+    "veeam_parameters": {
+      "veeam_std_cost": 1320,
+      "discount_veeam_price": 1320,
+      "max_no_workers_per_appliance": 4500
+    },
+    "vm_snapshot_cost": 0.132
+  },
+  "inputs": {
+    "vm_workloads": [
+      {
+        "category": "small",
+        "count": 2000,
+        "size": 50
+      },
+      {
+        "category": "medium",
+        "count": 8000,
+        "size": 100
+      },
+      {
+        "category": "large",
+        "count": 2000,
+        "size": 500
+      }
+    ],
+    "backup_properties": {
+      "retention_days": 14,
+      "backup_window": 8,
+      "snapshots_kept": 2,
+      "first_snap_full": true,
+      "avg_vdisk_utilization": 0.6,
+      "veeam_discount": 0,
+      "azure_discount": 0.3
+    }
+  }
+}

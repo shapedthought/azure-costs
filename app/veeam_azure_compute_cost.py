@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import math
-from settings import Settings
-from inputs import InputWorkload
-from veeam_backup import VeeamBackupResult
+from app.settings import Settings
+from app.inputs import InputWorkload
+from app.veeam_backup import VeeamBackupResult
 
 
 class VeeamComputeCostResult:

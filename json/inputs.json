@@ -21,7 +21,7 @@
     "backup_window": 8,
     "snapshots_kept": 2,
     "first_snap_full": true,
-    "avg_vdisk_utilization": 60,
+    "avg_vdisk_utilization": 0.6,
     "veeam_discount": 0,
     "azure_discount": 0.3
   }

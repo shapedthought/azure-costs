@@ -1,9 +1,3 @@
-import json
-import pprint
-from fastapi import FastAPI
-import functools
-from app.azure_backup_storage import AzureBackupCost, AzureBackupInstances
-
 # from full_response import FullResponse
 from app.veeam_azure_compute_cost import VeeamComputeCost
 from app.veeam_backup import VeeamBackup
@@ -29,11 +23,27 @@ from app.full_response import (
     VeeamAzureCostStorageResponse,
     VeeamBackupResponse,
 )
-from app.inputs_request import FullRequest
+from app.inputs_request import FullRequest, NoSettingsRequest
 from app.veeam_storage_costs import VeeamAzureCosts
 from app.cost_comparison import CostComparison
+from app.settings_request import SettingsRequest
+import json
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import functools
+from app.azure_backup_storage import AzureBackupCost, AzureBackupInstances
+
+origins = ["*"]
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class VmWorkload:
@@ -177,6 +187,175 @@ async def calculate(input_workload: FullRequest):
         general=general,
         veeam_parameters=parameters,
         vm_snapshot_cost=input_workload.settings.vm_snapshot_cost,
+    )
+
+    veeam_backup = VeeamBackup(settings=settings, inputs=input_workload_obj)
+    incremental_results = veeam_backup.calculate_incremental()
+    full_results = veeam_backup.calculate_totals(incremental_results)
+    azure_backup_instances = AzureBackupInstances(
+        settings=settings, inputs=input_workload_obj
+    )
+    azure_backup_instance_results = azure_backup_instances.calculate_backup()
+    azure_backup_cost = AzureBackupCost(
+        settings=settings,
+        inputs=input_workload_obj,
+        azure_backup=azure_backup_instance_results,
+        veeam_backup_totals=full_results,
+    )
+    azure_backup_cost_result = azure_backup_cost.calculate_backup_cost()
+    veeam_az_storage = VeeamAzureCosts(
+        settings=settings,
+        inputs=input_workload_obj,
+        veeam_backup_totals=full_results,
+    )
+    veeam_az_storage_results = veeam_az_storage.calculate_storage_costs()
+    veeam_az_compute = VeeamComputeCost(
+        settings=settings,
+        inputs=input_workload_obj,
+        veeam_backup_totals=full_results,
+    )
+    veeam_az_compute_totals = veeam_az_compute.calculate_compute_costs()
+    cost_comparison = CostComparison(
+        veeam_storage_costs=veeam_az_storage_results,
+        azure_backup_cost=azure_backup_cost_result,
+        veeam_compute_cost=veeam_az_compute_totals,
+    )
+    cost_comparison_results = cost_comparison.calculate_cost_comparison()
+    veeam_backup_response = VeeamBackupResponse(
+        inc_backup_size=round(full_results.incremental_size, 2),
+        total_backup_volume=round(full_results.total_backup_volume, 2),
+        snapshot_volume=round(full_results.snapshot_volume, 2),
+        api_put_month=round(full_results.api_put_per_month, 2),
+        inc_throughput=round(full_results.incremental_throughput, 2),
+        no_workers=full_results.no_workers,
+        no_storage_accounts=full_results.no_storage_accounts,
+    )
+    total_storage_cost_year: list[tuple[str, float]] = []
+    for storage in veeam_az_storage_results:
+        total_storage_cost_year.append(
+            (storage.name, round(storage.total_storage_cost_year, 2))
+        )
+    veeam_azure_cost_storage_response = VeeamAzureCostStorageResponse(
+        total_storage_cost_year=total_storage_cost_year
+    )
+    compute_cost_total_response = ComputeCostTotalResponse(
+        worker_cost=round(veeam_az_compute_totals.total_worker_cost, 2),
+        vba_appliance_cost=round(veeam_az_compute_totals.vba_appliance_total, 2),
+        vbr_servers_cost=round(veeam_az_compute_totals.vbr_servers_total, 2),
+    )
+    cost_comparison_response = CostComparisonResponse(
+        veeam_backup_total_cost_year=round(
+            cost_comparison_results.veeam_backup_total_cost_year, 2
+        ),
+        azure_backup_total_cost_year=round(
+            cost_comparison_results.azure_backup_total_cost_year, 2
+        ),
+        agent_backup_total_cost_year=round(
+            cost_comparison_results.agent_backup_total_cost_year, 2
+        ),
+    )
+    full_response = FullResponse(
+        cost_comparison=cost_comparison_response,
+        veeam_backup_totals=veeam_backup_response,
+        veeam_azure_cost_storage=veeam_azure_cost_storage_response,
+        veeam_compute_cost_totals=compute_cost_total_response,
+        veeam_vul_cost=veeam_az_compute_totals.vul_cost_year,
+        azure_backup_instances_cost=azure_backup_cost_result.azure_backup_instance_cost,
+    )
+    return full_response
+
+
+@app.post("/calculateDefault")
+async def calculate_default(input_workload: NoSettingsRequest):
+    with open("app/default_settings.json", "r") as f:
+        settings_input = SettingsRequest.model_validate(json.load(f))
+    api_costs = APICosts(
+        hot=settings_input.api_costs.hot,
+        cold=settings_input.api_costs.cold,
+    )
+    backup_service = BackupService(
+        per_vm_under_50=settings_input.azure_backup.backup_service.per_vm_under_50,
+        per_vm_over_50=settings_input.azure_backup.backup_service.per_vm_over_50,
+    )
+    backup_vault = BackupVault(
+        lrs=settings_input.azure_backup.backup_vault.lrs,
+        grs=settings_input.azure_backup.backup_vault.grs,
+        ra_grs=settings_input.azure_backup.backup_vault.ra_grs,
+    )
+    azure_backup = AzureBackup(
+        backup_service=backup_service,
+        backup_vault=backup_vault,
+        backup_snapshot_cost=settings_input.azure_backup.backup_snapshot_cost,
+    )
+    azure_blob = []
+    for blob in settings_input.azure_blob:
+        azure_blob.append(AzureBlob(name=blob.name, cost=blob.cost))
+
+    azure_compute = []
+    for compute in settings_input.azure_compute:
+        azure_compute.append(
+            AzureCompute(
+                vm_size=compute.vm_size,
+                per_hour=compute.per_hour,
+                worker=compute.worker,
+                throughput=compute.throughput,
+            )
+        )
+
+    worker_speed = get_worker_speed(settings_input.general.worker_speed)
+
+    storage_account_speed = get_storage_account_speed(
+        settings_input.general.azstorage_acc_limit
+    )
+
+    vbaz_appliance_ram = get_vbaz_appliance_ram(
+        settings_input.general.vbaz_appliance_ram
+    )
+
+    vm_workloads: list[VMWorkload] = []
+    for workload in input_workload.inputs.vm_workloads:
+        vm_workloads.append(
+            VMWorkload(
+                category=workload.category,
+                count=workload.count,
+                size=workload.size,
+            )
+        )
+
+    input_workload_obj = InputWorkload(
+        vm_workloads=vm_workloads,
+        backup_properties=input_workload.inputs.backup_properties,
+    )
+
+    general = General(
+        inputs=input_workload_obj,
+        veeam_reduction=settings_input.general.veeam_reduction,
+        azure_reduction=settings_input.general.azure_reduction,
+        daily_change_rate=settings_input.general.daily_change_rate,
+        veeam_source_block_size=settings_input.general.veeam_source_block_size,
+        worker_speed=worker_speed,
+        azstorage_acc_limit=storage_account_speed,
+        max_no_policies_per_vba=settings_input.general.max_no_policies_per_vba,
+        max_no_vms_per_vbr=settings_input.general.max_no_vms_per_vbr,
+        max_workloads_policy=settings_input.general.max_workloads_policy,
+        vbaz_appliance_ram=vbaz_appliance_ram,
+    )
+
+    parameters = VeeamParameters(
+        general=general,
+        veeam_std_cost=settings_input.veeam_parameters.veeam_std_cost,
+        discount_veeam_price=settings_input.veeam_parameters.discount_veeam_price,
+        max_no_workers_per_appliance=settings_input.veeam_parameters.max_no_workers_per_appliance,
+    )
+
+    settings = Settings(
+        azure_backup=azure_backup,
+        azure_blob=azure_blob,
+        api_costs=api_costs,
+        azure_compute=azure_compute,
+        general=general,
+        veeam_parameters=parameters,
+        vm_snapshot_cost=settings_input.vm_snapshot_cost,
     )
 
     veeam_backup = VeeamBackup(settings=settings, inputs=input_workload_obj)

@@ -1,0 +1,43 @@
+{
+  "cost_comparison": {
+    "veeam_backup_total_cost_year": 3523209.37,
+    "azure_backup_total_cost_year": 3843690.17,
+    "agent_backup_total_cost_year": 2146739.09
+  },
+  "veeam_backup_totals": {
+    "inc_backup_size": 17.58,
+    "total_backup_volume": 830.53,
+    "snapshot_volume": 1207.12,
+    "api_put_month": 1105920.0,
+    "inc_throughput": 640.0,
+    "no_workers": 8,
+    "no_storage_accounts": 1
+  },
+  "veeam_azure_cost_storage": {
+    "total_storage_cost_year": [
+      [
+        "Cold RA-GRS (payg)",
+        1734970.99
+      ],
+      [
+        "Cold RA-GRS (1PB-res-3y)",
+        1667103.96
+      ],
+      [
+        "Hot RA-GRS (payg)",
+        1906424.53
+      ],
+      [
+        "Hot RA-GRS (1PB-res-3y)",
+        1772833.64
+      ]
+    ]
+  },
+  "veeam_compute_cost_totals": {
+    "worker_cost": 1838.59,
+    "vba_appliance_cost": 2952.15,
+    "vbr_servers_cost": 1476.07
+  },
+  "veeam_vul_cost": 1848000.0,
+  "azure_backup_instances_cost": 1008000.0
+}

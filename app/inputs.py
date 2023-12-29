@@ -1,7 +1,3 @@
-from functools import reduce
-from pydantic import BaseModel
-
-
 class BackupProperties:
     retention_days: int
     backup_window: int

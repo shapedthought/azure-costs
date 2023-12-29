@@ -3,7 +3,6 @@ import functools
 from app.settings import Settings
 from app.inputs import InputWorkload
 import math
-import pprint
 
 
 @dataclass

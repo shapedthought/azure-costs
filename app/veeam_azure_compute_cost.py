@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import math
 from app.settings import Settings
 from app.inputs import InputWorkload

@@ -26,3 +26,7 @@ class InputWorkloadRequest(BaseModel):
 class FullRequest(BaseModel):
     settings: SettingsRequest
     inputs: InputWorkloadRequest
+
+
+class NoSettingsRequest(BaseModel):
+    inputs: InputWorkloadRequest

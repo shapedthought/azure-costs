@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import functools
@@ -90,6 +91,12 @@ def get_vbaz_appliance_ram(ram: int) -> VBAzureApplianceRAM:
             return VBAzureApplianceRAM.XLARGE
         case _:
             return VBAzureApplianceRAM.MEDIUM
+
+
+@app.get("/baseSettings")
+async def base_settings():
+    with open("json/full_request_updated.json") as f:
+        return json.load(f)
 
 
 @app.post("/calculate")

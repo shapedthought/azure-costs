@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import math
 from app.settings import Settings
 from app.inputs import InputWorkload
@@ -6,11 +5,11 @@ from app.veeam_backup import VeeamBackupResult
 
 
 class VeeamComputeCostResult:
-    worker_payg: float
-    worker_payg_year: float
+    worker_res: float
+    worker_res_year: float
     worker_res_3y: float
     worker_res_3y_year: float
-    vbas_payg: float
+    vbas_res: float
     vbas_payg_year: float
     vbas_res_3y: float
     vbas_res_3y_year: float
@@ -70,37 +69,18 @@ class VeeamComputeCost:
         self.veeam_backup_totals = veeam_backup_totals
 
     def calculate_compute_costs(self) -> VeeamComputeCostResult:
-        __f2s_v2_payg = list(
-            filter(
-                lambda x: x.vm_size == "Standard_F2s_v2, 2 CPU, 4 GB RAM (payg)",
-                self.settings.azure_compute,
-            )
-        )[0].per_month
+        worker_vm_cost = self.settings.azure_compute.worker.per_month
+        worker_vm_cost_res = self.settings.azure_compute.worker.per_month_payg
 
-        __f2s_v2_payg_res_3y = list(
-            filter(
-                lambda x: x.vm_size == "Standard_F2s_v2, 2 CPU, 4 GB RAM (res-3y)",
-                self.settings.azure_compute,
-            )
-        )[0].per_month
+        vba_vm_cost = self.settings.azure_compute.vba_server.per_month
+        vba_vm_cost_res = self.settings.azure_compute.vba_server.per_month_payg
 
-        __es4_v3_payg = list(
-            filter(
-                lambda x: x.vm_size == "E4s_v3 4 CPU 32 GB (payg)",
-                self.settings.azure_compute,
-            )
-        )[0].per_month
-
-        __es4_v3_res_3y = list(
-            filter(
-                lambda x: x.vm_size == "E4s_v3 4 CPU 32 GB (res-3y)",
-                self.settings.azure_compute,
-            )
-        )[0].per_month
+        vbr_vm_cost = self.settings.azure_compute.vbr_server.per_month
+        vbr_vm_cost_res = self.settings.azure_compute.vbr_server.per_month_payg
 
         __worker_payg_per_month = (
             self.veeam_backup_totals.no_workers
-            * __f2s_v2_payg
+            * worker_vm_cost
             * (1 - self.inputs.backup_properties.azure_discount)
             * self.inputs.backup_properties.backup_window
             / 24
@@ -108,19 +88,19 @@ class VeeamComputeCost:
 
         __worker_payg_3y_per_month = (
             self.veeam_backup_totals.no_workers
-            * __f2s_v2_payg_res_3y
+            * worker_vm_cost_res
             * (1 - self.inputs.backup_properties.azure_discount)
         )
 
         __vba_payg = (
             self.settings.veeam_parameters.result_min_vba_appliances
-            * __es4_v3_payg
+            * vba_vm_cost
             * (1 - self.inputs.backup_properties.azure_discount)
         )
 
         __vba_payg_res_3y = (
             self.settings.veeam_parameters.result_min_vba_appliances
-            * __es4_v3_res_3y
+            * vba_vm_cost_res
             * (1 - self.inputs.backup_properties.azure_discount)
         )
 
@@ -128,20 +108,20 @@ class VeeamComputeCost:
             math.ceil(
                 self.inputs.total_vm_count / self.settings.general.max_no_vms_per_vbr
             )
-            * __es4_v3_payg
+            * vbr_vm_cost
             * (1 - self.inputs.backup_properties.azure_discount)
         )
         __vbr_servers_res_3y = (
             math.ceil(
                 self.inputs.total_vm_count / self.settings.general.max_no_vms_per_vbr
             )
-            * __es4_v3_res_3y
+            * vbr_vm_cost_res
             * (1 - self.inputs.backup_properties.azure_discount)
         )
         __vbr_quantity_cost = (
             12
             * 3
-            * __es4_v3_res_3y
+            * vbr_vm_cost_res
             * (1 - self.inputs.backup_properties.azure_discount)
         )
         __vul_cost_year = (

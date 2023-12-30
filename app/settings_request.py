@@ -32,11 +32,17 @@ class AzureBlob(BaseModel):
     cost: float
 
 
-class AzureCompute(BaseModel):
+class AzureComputeInstance(BaseModel):
     vm_size: str
     per_hour: float
-    worker: bool
+    per_hour_payg: float
     throughput: int
+
+
+class AzureCompute(BaseModel):
+    worker: AzureComputeInstance
+    vba_server: AzureComputeInstance
+    vbr_server: AzureComputeInstance
 
 
 class General(BaseModel):
@@ -62,7 +68,7 @@ class SettingsRequest(BaseModel):
     azure_backup: AzureBackup
     azure_blob: list[AzureBlob]
     api_costs: APICosts
-    azure_compute: list[AzureCompute]
+    azure_compute: AzureCompute
     general: General
     veeam_parameters: VeeamParameters
     vm_snapshot_cost: float

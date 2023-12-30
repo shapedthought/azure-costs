@@ -2,6 +2,7 @@ from app.azure_backup_storage import AzureBackupCost, AzureBackupInstances
 from app.veeam_azure_compute_cost import VeeamComputeCost
 from app.veeam_backup import VeeamBackup
 from app.settings import (
+    AzureComputeInstance,
     Settings,
     VeeamParameters,
     AzureBackup,
@@ -60,32 +61,29 @@ class TestVeeamBackup(unittest.TestCase):
             discount_veeam_price=1302,
             max_no_workers_per_appliance=4500,
         )
-        self.azure_compute = [
-            AzureCompute(
-                vm_size="Standard_F2s_v2, 2 CPU, 4 GB RAM (payg)",
-                per_hour=0.1140,
-                worker=True,
-                throughput=90,
-            ),
-            AzureCompute(
-                vm_size="Standard_F2s_v2, 2 CPU, 4 GB RAM (res-3y)",
-                per_hour=0.05721,
-                worker=True,
-                throughput=90,
-            ),
-            AzureCompute(
-                vm_size="E4s_v3 4 CPU 32 GB (payg)",
-                per_hour=0.32,
-                worker=False,
-                throughput=0,
-            ),
-            AzureCompute(
-                vm_size="E4s_v3 4 CPU 32 GB (res-3y)",
-                per_hour=0.12203,
-                worker=False,
-                throughput=0,
-            ),
-        ]
+        __worker = AzureComputeInstance(
+            vm_size="Standard_F2s_v2, 2 CPU, 4 GB RAM",
+            per_hour=0.114,
+            per_hour_payg=0.05721,
+            throughput=90,
+        )
+        __vba_server = AzureComputeInstance(
+            vm_size="E4s_v3 4 CPU 32 GB",
+            per_hour=0.32,
+            per_hour_payg=0.12203,
+            throughput=0,
+        )
+        __vbr_server = AzureComputeInstance(
+            vm_size="E4s_v3 4 CPU 32 GB",
+            per_hour=0.32,
+            per_hour_payg=0.12203,
+            throughput=0,
+        )
+        self.azure_compute = AzureCompute(
+            worker=__worker,
+            vba_server=__vba_server,
+            vbr_server=__vbr_server,
+        )
 
         self.azure_blob = [
             AzureBlob(name="Cold RA-GRS (payg)", cost=0.025),

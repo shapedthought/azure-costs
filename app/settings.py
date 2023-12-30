@@ -69,23 +69,39 @@ class AzureBlob:
         self.cost_pb = cost * 1024**2
 
 
-class AzureCompute:
+class AzureComputeInstance:
     vm_size: str
     per_hour: float
-    per_month: float
-    per_year: float
-    worker: bool
+    per_hour_payg: float
     throughput: int
+    per_month: float
+    per_month_payg: float
 
     def __init__(
-        self, vm_size: str, per_hour: float, worker: bool, throughput: int
+        self, vm_size: str, per_hour: float, per_hour_res: float, throughput: int
     ) -> None:
         self.vm_size = vm_size
         self.per_hour = per_hour
+        self.per_hour_payg = per_hour_res
         self.per_month = per_hour * 24 * 30
-        self.per_year = self.per_month * 12
-        self.worker = worker
+        self.per_month_payg = per_hour_res * 24 * 30
         self.throughput = throughput
+
+
+class AzureCompute:
+    worker: AzureComputeInstance
+    vba_server: AzureComputeInstance
+    vba_server: AzureComputeInstance
+
+    def __init__(
+        self,
+        worker: AzureComputeInstance,
+        vba_server: AzureComputeInstance,
+        vbr_server: AzureComputeInstance,
+    ) -> None:
+        self.worker = worker
+        self.vba_server = vba_server
+        self.vbr_server = vbr_server
 
 
 class WorkerSpeed(Enum):
@@ -212,7 +228,7 @@ class Settings:
     azure_backup: AzureBackup
     azure_blob: list[AzureBlob]
     api_costs: APICosts
-    azure_compute: list[AzureCompute]
+    azure_compute: AzureCompute
     general: General
     veeam_parameters: VeeamParameters
     vm_snapshot_cost: float
@@ -222,7 +238,7 @@ class Settings:
         azure_backup: AzureBackup,
         azure_blob: list[AzureBlob],
         api_costs: APICosts,
-        azure_compute: list[AzureCompute],
+        azure_compute: AzureCompute,
         general: General,
         veeam_parameters: VeeamParameters,
         vm_snapshot_cost: float,

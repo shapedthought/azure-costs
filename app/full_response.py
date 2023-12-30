@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from app.cost_comparison import CostComparisonResult
 
 
 class VeeamBackupResponse(BaseModel):

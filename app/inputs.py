@@ -1,7 +1,3 @@
-from functools import reduce
-from pydantic import BaseModel
-
-
 class BackupProperties:
     retention_days: int
     backup_window: int
@@ -54,11 +50,6 @@ class InputWorkload:
     ) -> None:
         self.vm_workloads = vm_workloads
         self.backup_properties = backup_properties
-        # self.total_vm_count = reduce(lambda x, y: x + y.count, self.vm_workloads, 0)
-        # self.total_capacity = reduce(
-        #     lambda x, y: x + (y.size * y.count), self.vm_workloads, 0.0
-        # )
-        # self.total_size_tb = self.total_capacity / 1024
         self.total_vm_count = 0
         self.total_capacity_tb = 0
         for i in self.vm_workloads:

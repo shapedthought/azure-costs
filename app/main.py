@@ -1,6 +1,5 @@
-import json
-import pprint
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import functools
 from app.azure_backup_storage import AzureBackupCost, AzureBackupInstances
 
@@ -8,6 +7,7 @@ from app.azure_backup_storage import AzureBackupCost, AzureBackupInstances
 from app.veeam_azure_compute_cost import VeeamComputeCost
 from app.veeam_backup import VeeamBackup
 from app.settings import (
+    AzureComputeInstance,
     Settings,
     VeeamParameters,
     AzureBackup,
@@ -34,6 +34,10 @@ from app.veeam_storage_costs import VeeamAzureCosts
 from app.cost_comparison import CostComparison
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
+)
 
 
 class VmWorkload:
@@ -112,16 +116,30 @@ async def calculate(input_workload: FullRequest):
     for blob in input_workload.settings.azure_blob:
         azure_blob.append(AzureBlob(name=blob.name, cost=blob.cost))
 
-    azure_compute = []
-    for compute in input_workload.settings.azure_compute:
-        azure_compute.append(
-            AzureCompute(
-                vm_size=compute.vm_size,
-                per_hour=compute.per_hour,
-                worker=compute.worker,
-                throughput=compute.throughput,
-            )
-        )
+    input_worker = input_workload.settings.azure_compute.worker
+    worker = AzureComputeInstance(
+        input_worker.vm_size,
+        input_worker.per_hour,
+        input_worker.per_hour_payg,
+        input_worker.throughput,
+    )
+    input_vba_server = input_workload.settings.azure_compute.vba_server
+    vba_server = AzureComputeInstance(
+        input_vba_server.vm_size,
+        input_vba_server.per_hour,
+        input_vba_server.per_hour_payg,
+        input_vba_server.throughput,
+    )
+    input_vbr_server = input_workload.settings.azure_compute.vbr_server
+    vbr_server = AzureComputeInstance(
+        input_vbr_server.vm_size,
+        input_vbr_server.per_hour,
+        input_vbr_server.per_hour_payg,
+        input_vbr_server.throughput,
+    )
+    azure_compute = AzureCompute(
+        worker=worker, vba_server=vba_server, vbr_server=vbr_server
+    )
 
     worker_speed = get_worker_speed(input_workload.settings.general.worker_speed)
 

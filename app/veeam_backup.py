@@ -3,7 +3,6 @@ import functools
 from app.settings import Settings
 from app.inputs import InputWorkload
 import math
-import pprint
 
 
 @dataclass
@@ -75,7 +74,7 @@ class VeeamBackup:
                     )
                 )
                 / self.settings.general.veeam_source_block_size
-                / 1000
+                / 10000
             )
 
             __inc_throughput = (

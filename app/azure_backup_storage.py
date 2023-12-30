@@ -1,5 +1,4 @@
 import math
-import pprint
 from app.inputs import InputWorkload
 from app.settings import Settings
 from app.veeam_backup import VeeamBackupResult
